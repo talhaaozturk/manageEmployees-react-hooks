@@ -1,24 +1,56 @@
-import React from "react";
+import React, { useContext } from "react";
+import { EmployeeContext } from "../context/EmployeeContext";
+import { useState, useEffect } from "react";
+import { Button, Modal } from "react-bootstrap";
+import EditForm from "./EditForm";
 
 const Employee = ({ employeee }) => {
-  return employeee.map((employees) => (
-    <tr>
-      <td>{employees.name}</td>
-      <td>{employees.email}</td>
-      <td>{employees.phone}</td>
+  const { deleteEmployee } = useContext(EmployeeContext);
+  const [show, setShow] = useState(false);
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+  useEffect(() => {
+    handleClose();
+  }, [employeee]);
+  return (
+    <>
+      <td>{employeee.name}</td>
+      <td>{employeee.email}</td>
+      <td>{employeee.phone}</td>
       <td>
-        <a className="add" title="Add" data-toggle="tooltip">
-          <i className="material-icons">&#xE03B;</i>
-        </a>
-        <a className="edit" title="Edit" data-toggle="tooltip">
+        <button
+          onClick={handleShow}
+          className="btn text-warning"
+          title="Edit"
+          data-toggle="tooltip"
+        >
           <i className="material-icons">&#xE254;</i>
-        </a>
-        <a className="delete" title="Delete" data-toggle="tooltip">
+        </button>
+        <button
+          onClick={() => deleteEmployee(employeee.id)}
+          className="btn text-danger"
+          title="Delete"
+          data-toggle="tooltip"
+        >
           <i className="material-icons">&#xE872;</i>
-        </a>
+        </button>
       </td>
-    </tr>
-  ));
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add employee</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <EditForm theEmployee={employeee} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
 };
 
 export default Employee;

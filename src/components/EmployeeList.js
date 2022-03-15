@@ -47,7 +47,11 @@ const EmployeeList = () => {
           </tr>
         </thead>
         <tbody>
-          <Employee employeee={employeee} />
+          {employeee.map((employees) => (
+            <tr key={employees.id}>
+              <Employee employeee={employees} />
+            </tr>
+          ))}{" "}
         </tbody>
       </table>
 
