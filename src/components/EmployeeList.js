@@ -2,12 +2,15 @@ import "./Employee";
 import Employee from "./Employee";
 import { useEffect, useState } from "react";
 import { useContext } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Alert } from "react-bootstrap";
 import EmployeeAdd from "./EmployeeAdd";
 import { EmployeeContext } from "../context/EmployeeContext";
+import Pagination from "./Pagination";
 const EmployeeList = () => {
   const { employeee } = useContext(EmployeeContext);
   const [show, setShow] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [employeesPerPage] = useState(2);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -15,10 +18,34 @@ const EmployeeList = () => {
   useEffect(() => {
     handleClose();
   }, [employeee]);
+
+  const indexOfLastEmployee = currentPage * employeesPerPage; //o anki sayfayla,sayfada kaç tane çalışan göstermek istediğimi çarpıyorum
+  const indexOfFirstEmployee = indexOfLastEmployee - employeesPerPage;
+  const currentEmployee = employeee.slice(
+    indexOfFirstEmployee,
+    indexOfLastEmployee
+  );
+  const totalPagesNum = Math.ceil(employeee.length / employeesPerPage);
+  const [showAlert, setShowAlert] = useState(false);
+  const handleShowAlert = () => {
+    setShowAlert(true);
+  };
+  useEffect(() => {
+    handleClose(); //employee ekleyince otomatik kapanmasını sağlar
+    return () => {
+      handleShowAlert();
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 2200);
+    };
+  }, [employeee]);
   return (
     <>
       <div className="table-title">
         <div className="row">
+          <Alert show={showAlert} variant="success" dismissible>
+            Success
+          </Alert>
           <div className="col-sm-8">
             <h2>
               Employee <b>Details</b>
@@ -47,7 +74,7 @@ const EmployeeList = () => {
           </tr>
         </thead>
         <tbody>
-          {employeee.map((employees) => (
+          {currentEmployee.map((employees) => (
             <tr key={employees.id}>
               <Employee employeee={employees} />
             </tr>
@@ -55,6 +82,12 @@ const EmployeeList = () => {
         </tbody>
       </table>
 
+      <Pagination
+        pages={totalPagesNum}
+        setCurrentPage={setCurrentPage}
+        totalEmployee={employeee.length}
+        currentEmployee={currentEmployee}
+      />
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Add employee</Modal.Title>
